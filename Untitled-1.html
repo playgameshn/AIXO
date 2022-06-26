@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            box-sizing: border-box;
+        }
+        body{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            gap: 20px;
+        }
+        table{
+            border-collapse: collapse;
+            border: 1px solid #0077ff;
+        }
+        tr,th{ border: 1px solid #0077ff;}
+        th{
+            width: 100px;
+            height: 100px;
+            font-size: 50px;
+            transition: 0.5s;
+        }
+        .startguis{
+            background-color: #fbfbfb;
+            border-radius: 10px;
+            box-shadow: 0 0 10px 0px #0000002c;
+            overflow: hidden;
+            width: 95%;
+            height: 250px;
+            position: absolute;
+            visibility: hidden;
+            opacity: 0;
+            z-index: 100;
+        }
+        .startguis.active{
+            visibility: visible;
+            opacity: 1;
+        }
+        .startguis.active ~ .focus{
+            visibility: visible;
+            opacity: 1;
+        }
+        .startguis > div.unactive{
+            display: none;
+        }
+        .startguis > div{
+            width: 100%;
+            height: 100%;
+            display: flex;
+            border-radius: 10px;
+        }
+        .startguis > div > div{
+            height: 100%;
+            width: 100%;
+            padding: 30px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: black;
+            transition: 0.3s;
+
+        }
+        .startguis > div > div.active{
+            background-color: var(--i);
+            color: white;
+        }
+        .startguis > div p{
+            font-size: 70px;
+        }
+        .button{
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 5px 10px;
+            color: white;
+            background-color: silver;
+            border-radius: 5px;
+            cursor: none;
+        }
+        .button.active{
+            cursor: pointer;
+            background-color: orange;
+        }
+        .pbutton{
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 5px 10px;
+            color: white;
+            background-color: orange;
+            border-radius: 5px;
+        }
+        .focus{
+            background-color: white;
+            position: fixed;
+            width: 100%;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            z-index: 99;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.5s;
+        }
+        .endgui{
+            width: 95%;
+            background-color: #fbfbfb;
+            border-radius: 10px;
+            box-shadow: 0 0 10px 0px #0000002c;
+            overflow: hidden;
+            height: 100px;
+            position: absolute;
+            visibility: hidden;
+            opacity: 0;
+            z-index: 100;
+            bottom: -100%;
+            text-align: center;
+            padding: 20px;
+            transition: 0.5s;
+        }
+        .endgui p{
+            font-size: x-large;
+        }
+        .endgui.active{
+            visibility: visible;
+            opacity: 1;
+            bottom: 30px;
+        }
+        #p{
+            font-size: x-large;
+            background: linear-gradient(45deg, #ff0000, #7a00ff);
+            color: transparent;
+            -webkit-background-clip: text;
+        }
+        .reset{
+            position: absolute;
+            left: 10px;
+            bottom: 10px;
+            font-weight: 100;
+            text-decoration: underline;
+            font-style: italic;
+            color: silver;
+            display: none;
+        }
+        .reset.active{
+            display: block;
+        }
+        .copyright{
+            position: absolute;
+            z-index: 200;
+            opacity: 0.5;
+            font-size: x-large;
+            bottom: 0;
+            left: 0;
+            color: black;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+        <div class="startguis">
+            <div class="selectp">
+                <div style="--i: #0026ff;" vlu="O">
+                    <p>O</p>
+                    <span>Play By O</span>
+                </div>
+                <div style="--i: #ff0000;" vlu="X">
+                    <p>X</p>
+                    <span>Play By X</span>
+                </div>
+            </div>
+            <div class="selectd">
+                <div style="--i: #a200ff;" vlu="70">
+                    <p>E</p>
+                    <span>Easy</span>
+                </div>
+                <div style="--i: #ff0055;" vlu="50">
+                    <p>M</p>
+                    <span>Midium</span>
+                </div>
+                <div style="--i: #00b469;" vlu="10">
+                    <p>H</p>
+                    <span>Hard</span>
+                </div>
+            </div>
+            <span class="reset">get last settings</span>
+            <span class="button">Select</span>
+        </div>
+        <div class="endgui">
+            <p>tie si by</p>
+            <span class="pbutton">Play Again</span>
+        </div>
+    <p id="p">Can You Win The A.I?</p>
+    <table id="table9">
+        <tr><th id="0"></th><th id="1"></th><th id="2"></th></tr>
+        <tr><th id="3"></th><th id="4"></th><th id="5"></th></tr>
+        <tr><th id="6"></th><th id="7"></th><th id="8"></th></tr>
+    </table>
+    <span class="focus"></span>
+    <span class="copyright">by Mostafa Maher</span>
+    <script>
+        //gui
+        var reset = document.querySelector(".reset")
+        var playag = document.querySelector(".endgui span")
+        var endgui = document.querySelector(".endgui")
+        var endp = document.querySelector(".endgui p")
+        var egui = document.querySelectorAll(".startguis > div div");
+        var sgui = document.querySelector(".startguis")
+        var selectb = document.querySelector(".selectb");
+        var selectp = document.querySelector(".selectp");
+        var selectd = document.querySelector(".selectd");
+        var button = document.querySelector(".button")
+        var aui = selectp;
+        function activ(a){a.forEach(item => {item.addEventListener('click',()=>{toggle(a,item)})})}
+        function toggle(a,c){a.forEach(item => {item.classList.remove("active")});c.classList.add("active");button.classList.add("active")}
+        activ(egui);
+        sgui.classList.add('active')
+        button.addEventListener('click',function(){
+            if(aui == selectp){
+                huplayer = document.querySelector(".selectp div.active").getAttribute('vlu');
+                if(huplayer == 'X'){aiplayer = 'O'}else{aiplayer = 'X'}
+                aui.classList.add('unactive')
+                aui = selectd;
+                aui.classList.remove('unactive')
+                button.classList.remove('active')
+                reset.classList.remove('active')
+            }else{
+                error = document.querySelector(".selectd div.active").getAttribute('vlu')
+                aui.classList.add('unactive')
+                aui = selectp;
+                aui.classList.remove('unactive')
+                button.classList.remove('active')
+                sgui.classList.remove('active')
+                startGame()
+            }
+        })
+        playag.addEventListener("click",function(){sgui.classList.add('active');endgui.classList.remove("active");reset.classList.add("active")})
+        reset.addEventListener("click",function(){sgui.classList.remove('active');reset.classList.remove("active");startGame()})
+    </script>
+    <script>
+        var cells = document.querySelectorAll(`th`);
+        var origBoard;
+        var huplayer;
+        var aiplayer;
+        var error;
+        var wins = [
+            [1,2,3],
+            [4,5,6],
+            [7,8,9],
+            [1,4,7],
+            [2,5,8],
+            [3,6,9],
+            [1,5,9],
+            [3,5,7]
+        ]
+        function errorcalc(){
+            var randomf = Math.floor(Math.random() * error)
+            var randoms = Math.floor(Math.random() * 100)
+            if(Math.max(randomf,randoms) == randomf){return 1}else{return 2}
+        }
+        function startGame() {
+            origBoard = Array.from(Array(9).keys());
+            for (var i = 0; i < cells.length; i++) {
+                cells[i].innerText = '';
+                cells[i].style.color = 'white';
+                cells[i].addEventListener('click', turnclick);
+            }
+        }
+        function checkwin(board,player){
+            var state = false;
+            for(let i=0; i<wins.length;i++){
+                if(board[wins[i][0] -1] == board[wins[i][1] -1] && board[wins[i][0] -1] == board[wins[i][2] -1] && board[wins[i][0] -1] == player){
+                    state = true;
+                }
+            }
+                 return state;   
+        }
+        function emptysquares() {
+            return origBoard.filter(s => typeof s == 'number');
+        }
+        function checktie(board) {
+            if(emptysquares() == false){return true;}else{return false}
+        }
+        function turnclick(square){
+            if(typeof origBoard[square.target.id] == 'number'){
+                turn(square.target.id,huplayer)
+                 if (!checkwin(origBoard,huplayer) && !checktie(origBoard,huplayer)) {
+                    turn(bestsquare().index,aiplayer)
+                 }
+            }
+        }
+        function getC(player){
+            if (player == huplayer){
+                return 'green';
+            }else{
+                return 'red';
+            }
+
+        }
+        function playerwon(player){
+            if (player == huplayer) {
+                endp.innerHTML = "You Won!"
+            }else{
+                endp.innerHTML = "AI Win You!"
+            }
+            endgui.classList.add("active")
+        }
+        function boardtie(){
+            endp.innerHTML = "it's Tie!"
+            endgui.classList.add("active")
+        }
+        function turn(square,player){
+            document.getElementById(square).innerText = player;
+            document.getElementById(square).style.color = getC(player)
+            origBoard[square] = player;
+            if(checkwin(origBoard,player)){
+                playerwon(player)
+            }else if(checktie()){
+                boardtie()
+            }
+        }
+        function bestsquare(){
+            if (errorcalc() == 1) {
+                console.log("error")
+                return minimax(origBoard,huplayer)
+            }else{
+                return minimax(origBoard,aiplayer);
+            }
+        }
+
+function minimax(newBoard,player){
+    var availSpots = emptysquares()
+
+    if (checkwin(newBoard,aiplayer)) {
+        return{score:10};
+    }else if(checkwin(newBoard,huplayer)){
+        return{score:-10}
+    }else if(availSpots.length == 0){
+        return{score:0}
+    }
+
+    var moves = []
+    for(let i = 0; i < availSpots.length; i++){
+        var move = {}
+        move.index = newBoard[availSpots[i]]
+        newBoard[availSpots[i]] = player
+        if (player == aiplayer) {
+            var result = minimax(newBoard,huplayer)
+            move.score = result.score
+        }else{
+            var result = minimax(newBoard,aiplayer)
+            move.score = result.score
+        }
+        newBoard[availSpots[i]] = move.index
+        moves.push(move)
+    }
+    var bestMove;
+    if(player == aiplayer){
+        var bestScore = -Infinity
+        for(let i = 0; i < moves.length; i++){
+            if(moves[i].score > bestScore){
+                bestScore = moves[i].score
+                bestMove = i
+            }
+        }
+    }else{
+        var bestScore = Infinity
+        for(let i = 0; i < moves.length; i++){
+            if(moves[i].score < bestScore){
+                bestScore = moves[i].score
+                bestMove = i
+            }
+        }
+    }
+
+    return moves[bestMove];
+}
+
+    </script>
+</body>
+</html>
